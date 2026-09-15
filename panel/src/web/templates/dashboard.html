@@ -4,10 +4,61 @@
 
 {% block content %}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <div class="bg-white rounded-lg shadow p-5">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">
-            Ноды ({{ nodes|length }})
-        </h2>
+    <div class="bg-white rounded-lg shadow p-5" x-data="{ showCreateNode: false, nodeError: null }">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-700">Ноды ({{ nodes|length }})</h2>
+            <button @click="showCreateNode = !showCreateNode"
+                    class="bg-vodkin-red hover:bg-red-700 text-white text-sm font-medium px-3 py-1.5 rounded transition-colors">
+                + Новая нода
+            </button>
+        </div>
+
+        <div x-show="showCreateNode" x-cloak class="mb-4 p-4 bg-gray-50 rounded border space-y-3">
+            <p class="text-xs text-gray-400">
+                Заполните тем, что вывел <code>install.sh</code> на самой ноде.
+            </p>
+            <form hx-post="/api/nodes" hx-ext="json-enc" hx-swap="none"
+                  hx-on::after-request="
+                    if (event.detail.successful) { location.reload(); }
+                    else { nodeError = JSON.parse(event.detail.xhr.responseText).detail || 'Ошибка создания ноды'; }
+                  "
+                  class="space-y-2">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Имя (для себя)</label>
+                        <input type="text" name="name" required placeholder="nodert-vodkinnet"
+                               class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Hostname</label>
+                        <input type="text" name="hostname" required placeholder="212.87.190.95"
+                               class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Agent port</label>
+                        <input type="number" name="agent_port" value="8181" required
+                               class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">AWG listen port</label>
+                        <input type="number" name="listen_port" value="55632" required
+                               class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Agent token</label>
+                    <input type="text" name="agent_token" required minlength="32"
+                           placeholder="строка из вывода install.sh на ноде"
+                           class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm font-mono">
+                </div>
+                <button type="submit"
+                        class="bg-vodkin-blue hover:bg-vodkin-blue-dark text-white text-sm font-medium px-4 py-1.5 rounded transition-colors">
+                    Добавить и инициализировать
+                </button>
+                <p x-show="nodeError" x-cloak class="text-xs text-vodkin-red" x-text="nodeError"></p>
+            </form>
+        </div>
+
         <div class="space-y-2">
             {% for node in nodes %}
             <a href="/nodes/{{ node.id }}"
@@ -30,10 +81,62 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-5">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">
-            Роутеры ({{ routers|length }})
-        </h2>
+    <div class="bg-white rounded-lg shadow p-5" x-data="{ showCreateRouter: false, routerError: null }">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-700">Роутеры ({{ routers|length }})</h2>
+            <button @click="showCreateRouter = !showCreateRouter"
+                    class="bg-vodkin-red hover:bg-red-700 text-white text-sm font-medium px-3 py-1.5 rounded transition-colors">
+                + Новый роутер
+            </button>
+        </div>
+
+        <div x-show="showCreateRouter" x-cloak class="mb-4 p-4 bg-gray-50 rounded border space-y-3">
+            <form hx-post="/api/routers" hx-ext="json-enc" hx-swap="none"
+                  hx-on::after-request="
+                    if (event.detail.successful) { location.reload(); }
+                    else { routerError = JSON.parse(event.detail.xhr.responseText).detail || 'Ошибка создания роутера'; }
+                  "
+                  class="space-y-2">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Имя</label>
+                        <input type="text" name="name" required placeholder="VodkinR1_Router"
+                               class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Тип</label>
+                        <select name="type" required class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
+                            <option value="openwrt">OpenWrt</option>
+                            <option value="keenetic">Keenetic</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Модель (необязательно)</label>
+                        <input type="text" name="model" placeholder="Cudy WBR3000AX"
+                               class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Хаб (необязательно)</label>
+                        <select name="remote_hub" class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
+                            <option value="">—</option>
+                            <option value="owrt-remote">owrt-remote</option>
+                            <option value="netcraze-remote">netcraze-remote</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Ссылка на карточку в хабе (необязательно)</label>
+                    <input type="text" name="remote_hub_url" placeholder="https://hub.vodkin.net:9443/..."
+                           class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
+                </div>
+                <button type="submit"
+                        class="bg-vodkin-blue hover:bg-vodkin-blue-dark text-white text-sm font-medium px-4 py-1.5 rounded transition-colors">
+                    Добавить роутер
+                </button>
+                <p x-show="routerError" x-cloak class="text-xs text-vodkin-red" x-text="routerError"></p>
+            </form>
+        </div>
+
         <div class="flex gap-4 text-sm">
             <span class="flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-status-up"></span>
