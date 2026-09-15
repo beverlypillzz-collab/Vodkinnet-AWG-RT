@@ -1,0 +1,41 @@
+# Deploy this file on each AmneziaWG node (e.g. nodert-vodkinnet).
+# Copy .env.example to .env next to this file and fill in real values
+# before running `docker compose up -d`.
+
+services:
+  amnezia-awg2:
+    build: ./amnezia-awg2
+    image: amnezia-awg2:2.0.0
+    container_name: amnezia-awg2
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    security_opt:
+      - "label=disable"
+    sysctls:
+      net.ipv4.conf.all.src_valid_mark: 1
+    restart: always
+    ports:
+      - "${AWG_LISTEN_PORT}:${AWG_LISTEN_PORT}/udp"
+    volumes:
+      - /lib/modules:/lib/modules
+
+  node-agent:
+    build: .
+    container_name: node-agent
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      # Read-only where possible — the agent only ever needs to run
+      # `exec` calls, never to create/stop/remove containers, but the
+      # Docker API doesn't support a read-only-except-exec socket
+      # permission model, so this is enforced in application code
+      # (see docker_control/executor.py) rather than at the mount
+      # level. Documented here as a known limitation, not an oversight.
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "127.0.0.1:${LISTEN_PORT:-8181}:8181"
+    depends_on:
+      - amnezia-awg2

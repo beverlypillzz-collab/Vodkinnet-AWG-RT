@@ -1,0 +1,53 @@
+<table class="w-full text-sm">
+    <thead>
+        <tr class="text-left text-gray-500 border-b">
+            <th class="pb-2 font-medium">Имя</th>
+            <th class="pb-2 font-medium">Тип</th>
+            <th class="pb-2 font-medium">Статус</th>
+            <th class="pb-2 font-medium">Хендшейк</th>
+            <th class="pb-2 font-medium">Хаб</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in routers %}
+        <tr class="border-b last:border-0">
+            <td class="py-2 font-medium text-gray-800">{{ r.name }}</td>
+            <td class="py-2 text-gray-500">
+                {% if r.type == 'openwrt' %}OpenWrt{% else %}Keenetic{% endif %}
+            </td>
+            <td class="py-2">
+                {% if r.awg_link_status == 'up' %}
+                    <span class="inline-flex items-center gap-1.5 text-status-up">
+                        <span class="w-2 h-2 rounded-full bg-status-up"></span> в сети
+                    </span>
+                {% elif r.awg_link_status == 'stale' %}
+                    <span class="inline-flex items-center gap-1.5 text-status-stale">
+                        <span class="w-2 h-2 rounded-full bg-status-stale"></span> нестабильно
+                    </span>
+                {% elif r.awg_link_status == 'down' %}
+                    <span class="inline-flex items-center gap-1.5 text-status-down">
+                        <span class="w-2 h-2 rounded-full bg-status-down"></span> офлайн
+                    </span>
+                {% else %}
+                    <span class="inline-flex items-center gap-1.5 text-gray-400">
+                        <span class="w-2 h-2 rounded-full bg-gray-300"></span> неизвестно
+                    </span>
+                {% endif %}
+            </td>
+            <td class="py-2 text-gray-500">
+                {% if r.last_handshake_at %}{{ r.last_handshake_at.strftime('%d.%m %H:%M') }}{% else %}—{% endif %}
+            </td>
+            <td class="py-2">
+                {% if r.remote_hub_url %}
+                <a href="{{ r.remote_hub_url }}" target="_blank"
+                   class="text-vodkin-blue hover:underline">{{ r.remote_hub }}</a>
+                {% else %}
+                <span class="text-gray-300">—</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="py-4 text-center text-gray-400">Роутеров пока нет.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

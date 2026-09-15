@@ -1,0 +1,43 @@
+# === Secrets — NEVER commit these (public repo) ===
+.env
+.env.*
+!.env.example
+*.age
+secrets/
+*.key
+*.pem
+agent_token.txt
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# === Logs ===
+*.log
+logs/
+
+# === Alembic (keep versions/, ignore local db state if any) ===
+*.db
+*.sqlite3
+
+# === OS / editor ===
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# === Docker ===
+docker-compose.override.yml
+
+# === Frontend build artifacts (if any Tailwind build step is added) ===
+node_modules/
+dist/

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — VodkinNET AWG-RT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: {
+                'vodkin-blue': '#1E4A9C',
+                'vodkin-red': '#C6262E',
+            } } }
+        }
+    </script>
+</head>
+<body class="bg-vodkin-blue min-h-screen flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm">
+        <h1 class="text-2xl font-bold text-vodkin-blue mb-1">VodkinNET</h1>
+        <p class="text-sm text-gray-500 mb-6">AWG-RT — панель управления</p>
+
+        {% if error %}
+        <div class="bg-red-50 border border-vodkin-red text-vodkin-red text-sm rounded px-3 py-2 mb-4">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" action="/login" class="space-y-4">
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Имя пользователя</label>
+                <input type="text" name="username" required autofocus
+                       class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-vodkin-blue">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Пароль</label>
+                <input type="password" name="password" required
+                       class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-vodkin-blue">
+            </div>
+            <button type="submit"
+                    class="w-full bg-vodkin-red hover:bg-red-700 text-white font-semibold rounded px-3 py-2 transition-colors">
+                Войти
+            </button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VodkinNET AWG-RT{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'vodkin-blue': '#1E4A9C',
+                        'vodkin-blue-dark': '#153868',
+                        'vodkin-red': '#C6262E',
+                        'vodkin-red-dark': '#9E1E24',
+                        'status-up': '#2FA84F',
+                        'status-stale': '#E8A33D',
+                        'status-down': '#C6262E',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://unpkg.com/htmx-ext-json-enc@2.0.1/json-enc.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <style>[x-cloak] { display: none !important; }</style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-vodkin-blue text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3">
+                <span class="text-xl font-bold tracking-tight">VodkinNET</span>
+                <span class="text-sm text-blue-200">AWG-RT</span>
+            </a>
+            {% if admin %}
+            <div class="flex items-center gap-4 text-sm">
+                <span class="text-blue-200">{{ admin.username }}</span>
+                <a href="/logout" class="hover:text-vodkin-red transition-colors">Выйти</a>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-center text-xs text-gray-400 py-6">
+        VodkinNET — Сети, инфраструктура, решения
+    </footer>
+</body>
+</html>
