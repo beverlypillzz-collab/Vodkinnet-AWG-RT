@@ -10,6 +10,8 @@ sudo ./install.sh
 
 См. `docs/deployment.md` для полного описания того, что делает скрипт, и как поставить перед панелью reverse-proxy с TLS.
 
+После установки рабочая копия живёт в `/opt/vodkinnet-awg-rt`, под сервисным аккаунтом `awgrt` — все команды `docker compose` ниже нужно выполнять как `sudo -u awgrt docker compose -f /opt/vodkinnet-awg-rt/docker-compose.yml ...`, а не напрямую как root.
+
 ## Локальная разработка (без Docker)
 
 ```bash
@@ -41,7 +43,7 @@ pytest tests/ -v
 
 **Логи с request-id**, как и у node-agent — каждый запрос помечен коротким id, можно грепать всю цепочку:
 ```bash
-docker compose logs -f panel | grep a1b2c3d4
+sudo -u awgrt docker compose -f /opt/vodkinnet-awg-rt/docker-compose.yml logs -f panel | grep a1b2c3d4
 ```
 
 **Включить подробное логирование** без пересборки:
@@ -50,7 +52,7 @@ docker compose logs -f panel | grep a1b2c3d4
 LOG_LEVEL=DEBUG
 ```
 ```bash
-docker compose up -d panel
+sudo -u awgrt docker compose -f /opt/vodkinnet-awg-rt/docker-compose.yml up -d panel
 ```
 На DEBUG видно SQL-запросы (через `sqlalchemy.engine`) и все вызовы к node-agent (через `httpx`).
 
@@ -67,19 +69,19 @@ curl -v http://<node-hostname>:<agent_port>/health
 
 Это ожидаемое поведение после истечения TTL (48ч по умолчанию) — приватный ключ клиента никогда не хранился в Postgres, только в Redis с TTL. Единственный выход — создать нового пира. Проверить, жив ли ещё кэш:
 ```bash
-docker compose exec redis redis-cli GET "config:<peer_id>"
-docker compose exec redis redis-cli TTL "config:<peer_id>"
+sudo -u awgrt docker compose -f /opt/vodkinnet-awg-rt/docker-compose.yml exec redis redis-cli GET "config:<peer_id>"
+sudo -u awgrt docker compose -f /opt/vodkinnet-awg-rt/docker-compose.yml exec redis redis-cli TTL "config:<peer_id>"
 ```
 
 **Проверить состояние миграций:**
 ```bash
-docker compose exec panel alembic current
-docker compose exec panel alembic history
+sudo -u awgrt docker compose -f /opt/vodkinnet-awg-rt/docker-compose.yml exec panel alembic current
+sudo -u awgrt docker compose -f /opt/vodkinnet-awg-rt/docker-compose.yml exec panel alembic history
 ```
 
 **Зайти в БД напрямую:**
 ```bash
-docker compose exec postgres psql -U awgrt -d awgrt
+sudo -u awgrt docker compose -f /opt/vodkinnet-awg-rt/docker-compose.yml exec postgres psql -U awgrt -d awgrt
 ```
 
 ## Безопасность (прочитать перед изменением auth/security.py или peer_service.py)
