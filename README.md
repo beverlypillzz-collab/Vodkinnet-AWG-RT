@@ -19,10 +19,10 @@ git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz
 
 **Каждая нода** (на каждом AWG-сервере) — скопировать и выполнить целиком:
 ```bash
-git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz-collab/Vodkinnet-AWG-RT.git && cd Vodkinnet-AWG-RT && git sparse-checkout set node-agent && cd node-agent && sudo ./install.sh && cd .. && rm -rf .git
+git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz-collab/Vodkinnet-AWG-RT.git && cd Vodkinnet-AWG-RT && git sparse-checkout set node-agent && cd node-agent && sudo ./install.sh && cd ../.. && rm -rf Vodkinnet-AWG-RT
 ```
 
-Панель ставится под отдельным сервисным аккаунтом (не под root) в `/opt/vodkinnet-awg-rt` — подробности и честная оценка границ этой изоляции в `docs/deployment.md`. Каждая команда клонирует только нужную папку (не весь репозиторий), ставит Docker при необходимости, генерирует секреты и поднимает контейнеры — без ручных промежуточных шагов. Полная инструкция — `docs/deployment.md`.
+Панель и каждая нода ставятся под отдельными сервисными аккаунтами (не под root) — `/opt/vodkinnet-awg-rt` и `/opt/vodkinnet-awg-agent` соответственно; подробности и честная оценка границ этой изоляции в `docs/deployment.md`. Каждая команда клонирует только нужную папку (не весь репозиторий), ставит Docker при необходимости, генерирует секреты и поднимает контейнеры — без ручных промежуточных шагов. Полная инструкция — `docs/deployment.md`.
 
 ## Почему AmneziaWG 2.0
 

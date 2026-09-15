@@ -50,10 +50,10 @@ server {
 
 ## Нода (на каждом AWG-сервере, например `my-awg-node`)
 
-Скопируйте и выполните целиком — клонирует только `node-agent/`, ставит и убирает служебные git-данные:
+Скопируйте и выполните целиком — клонирует только `node-agent/`, ставит всё под отдельным сервисным аккаунтом (не под root), в конце убирает исходный клон целиком:
 
 ```bash
-git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz-collab/Vodkinnet-AWG-RT.git && cd Vodkinnet-AWG-RT && git sparse-checkout set node-agent && cd node-agent && sudo ./install.sh && cd .. && rm -rf .git
+git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz-collab/Vodkinnet-AWG-RT.git && cd Vodkinnet-AWG-RT && git sparse-checkout set node-agent && cd node-agent && sudo ./install.sh && cd ../.. && rm -rf Vodkinnet-AWG-RT
 ```
 
 Скрипт спросит:
@@ -63,11 +63,21 @@ git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz
 
 И дальше сам:
 1. Ставит Docker, если его нет
-2. Генерирует `.env` со случайным `AGENT_TOKEN`
-3. Собирает `amnezia-awg2` (на базе `amneziavpn/amneziawg-go:2.0.0`) и `node-agent`
-4. Поднимает оба контейнера
-5. Ждёт, пока agent ответит на `/health`
-6. **Печатает данные для добавления ноды в панель**: hostname, agent_port, listen_port, agent_token — скопируйте сразу, токен больше не выводится
+2. Создаёт системный аккаунт `awgagent` (без интерактивного входа) и добавляет его в группу `docker`
+3. Копирует файлы в `/opt/vodkinnet-awg-agent`, отдаёт во владение этому аккаунту
+4. Генерирует `.env` со случайным `AGENT_TOKEN`
+5. Собирает `amnezia-awg2` (на базе `amneziavpn/amneziawg-go:2.0.0`) и `node-agent`, поднимает оба контейнера **от имени `awgagent`**, не root
+6. Ждёт, пока agent ответит на `/health`
+7. **Печатает данные для добавления ноды в панель**: hostname, agent_port, listen_port, agent_token — скопируйте сразу, токен больше не выводится
+8. Подсказывает, что исходный клон можно удалить целиком — всё уже лежит в `/opt/vodkinnet-awg-agent`
+
+**Управление после установки** — от имени `awgagent`, не root:
+```bash
+sudo -u awgagent docker compose -f /opt/vodkinnet-awg-agent/docker-compose.yml logs -f node-agent
+sudo -u awgagent docker compose -f /opt/vodkinnet-awg-agent/docker-compose.yml restart node-agent
+```
+
+Та же оговорка про честные границы изоляции, что и для панели — см. раздел про сервисный аккаунт выше: группа `docker` равносильна root, это разделение обязанностей, а не песочница.
 
 ### Сетевые требования на ноде
 
@@ -103,11 +113,11 @@ ufw allow 55632/udp
 
 ## Откат / переустановка ноды
 
-`install.sh` безопасно перезапускать — если `.env` уже существует, он не трогается (чтобы не потерять `agent_token`, уже зарегистрированный в панели). Если нужно полностью пересоздать ноду с нуля:
+`install.sh` безопасно перезапускать — если `.env` уже существует в `/opt/vodkinnet-awg-agent`, он не трогается (чтобы не потерять `agent_token`, уже зарегистрированный в панели). Если нужно полностью пересоздать ноду с нуля:
 
 ```bash
-docker compose down -v
-rm .env
+sudo -u awgagent docker compose -f /opt/vodkinnet-awg-agent/docker-compose.yml down -v
+rm /opt/vodkinnet-awg-agent/.env
 sudo ./install.sh
 ```
 

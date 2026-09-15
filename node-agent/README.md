@@ -8,31 +8,31 @@ fixed container name and never accepts one from an API request.
 
 ## Prerequisites on the node
 
-- Docker + Docker Compose
-- An already-built `amnezia-awg2:2.0.0` image (see the main repo's
-  `docs/deployment.md` for how that image is built)
+- Nothing beyond a Debian/Ubuntu-family host with root access —
+  `install.sh` installs Docker itself if it's missing, and builds
+  `amnezia-awg2:2.0.0` from the bundled `amnezia-awg2/Dockerfile`.
 
 ## Setup
 
 ```bash
-cp .env.example .env
-# generate a real token:
-openssl rand -hex 32
-# paste it into AGENT_TOKEN in .env, and register the same value
-# for this node in the panel's "Add node" form
+sudo ./install.sh
 ```
 
-Fill in `AWG_LISTEN_PORT` to match whatever UDP port this node's
-AmneziaWG server should listen on.
+It creates a dedicated service account (`awgagent`, no login shell),
+copies this directory's files into `/opt/vodkinnet-awg-agent` owned
+by that account, prompts for the node name/port/public endpoint,
+generates `.env` there, then builds and starts both containers as
+`awgagent` — never as root. See `docs/deployment.md` for the full
+walkthrough and the honest tradeoffs of the service-account approach.
 
-```bash
-docker compose up -d --build
-```
+After that, this cloned directory is no longer needed — everything
+below refers to the canonical install at `/opt/vodkinnet-awg-agent`,
+managed as the `awgagent` account.
 
 ## Verifying it came up correctly
 
 ```bash
-docker compose ps
+sudo -u awgagent docker compose -f /opt/vodkinnet-awg-agent/docker-compose.yml ps
 # both amnezia-awg2 and node-agent should show "Up"
 
 curl -s http://127.0.0.1:8181/health | python3 -m json.tool
@@ -56,23 +56,23 @@ Debugging below.
 **Always start with logs, not guessing:**
 
 ```bash
-docker compose logs -f node-agent
+sudo -u awgagent docker compose -f /opt/vodkinnet-awg-agent/docker-compose.yml logs -f node-agent
 ```
 
 Every request gets a short correlation id (`[a1b2c3d4]`) so you can
 grep one request's full trail across modules:
 
 ```bash
-docker compose logs node-agent | grep a1b2c3d4
+sudo -u awgagent docker compose -f /opt/vodkinnet-awg-agent/docker-compose.yml logs node-agent | grep a1b2c3d4
 ```
 
-**Turn on verbose logging** without rebuilding — edit `.env`:
+**Turn on verbose logging** without rebuilding — edit `/opt/vodkinnet-awg-agent/.env`:
 ```
 LOG_LEVEL=DEBUG
 ```
 then:
 ```bash
-docker compose up -d node-agent
+sudo -u awgagent docker compose -f /opt/vodkinnet-awg-agent/docker-compose.yml up -d node-agent
 ```
 At `DEBUG`, every `docker exec` call into `amnezia-awg2` is logged
 with its full command line — except any call that could contain key
@@ -94,10 +94,10 @@ debugging.
 # is the container actually named what .env says?
 docker ps --format '{{.Names}}'
 # does AWG_CONTAINER_NAME in .env match exactly?
-grep AWG_CONTAINER_NAME .env
+grep AWG_CONTAINER_NAME /opt/vodkinnet-awg-agent/.env
 
 # can the agent reach the docker socket at all?
-docker compose exec node-agent python3 -c \
+sudo -u awgagent docker compose -f /opt/vodkinnet-awg-agent/docker-compose.yml exec node-agent python3 -c \
   "import docker; print(docker.from_env().ping())"
 ```
 
@@ -114,8 +114,7 @@ docker exec amnezia-awg2 awg-quick up /opt/amnezia/awg/awg0.conf
 This will print the real error instead of the agent's already-logged
 but possibly truncated version.
 
-**Testing the API by hand** (replace `$TOKEN` with your real
-`AGENT_TOKEN`):
+**Testing the API by hand** (find `$TOKEN` in `/opt/vodkinnet-awg-agent/.env`):
 
 ```bash
 curl -s -X POST http://127.0.0.1:8181/server/init \
