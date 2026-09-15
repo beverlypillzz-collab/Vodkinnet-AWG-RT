@@ -12,7 +12,7 @@ async def test_create_and_list_router(app_client, auth_headers):
             "type": "openwrt",
             "model": "Cudy WBR3000AX",
             "remote_hub": "owrt-remote",
-            "remote_hub_url": "https://hub.vodkin.net:9443/routers/1",
+            "remote_hub_url": "https://example-hub.example.com/routers/1",
         },
     )
     assert create_resp.status_code == 201

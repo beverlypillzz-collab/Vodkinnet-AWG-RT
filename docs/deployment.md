@@ -15,12 +15,12 @@ sudo ./install.sh
 4. Ждёт, пока панель ответит на `/docs`
 5. Предлагает создать первого админа интерактивно (`docker compose exec panel python3 scripts/create_admin.py`)
 
-**После установки** панель слушает `127.0.0.1:8000` — снаружи не торчит специально. Поставьте перед ней ваш существующий nginx/Caddy с TLS, как уже сделано для `hub.vodkin.net`/`panel.vodkin.net`:
+**После установки** панель слушает `127.0.0.1:8000` — снаружи не торчит специально. Поставьте перед ней свой существующий nginx/Caddy с TLS:
 
 ```nginx
 server {
     listen 443 ssl;
-    server_name awg-rt.vodkin.net;
+    server_name your-panel-domain.example;
     # ... ваши обычные SSL-директивы (acme.sh/certbot) ...
     location / {
         proxy_pass http://127.0.0.1:8000;
