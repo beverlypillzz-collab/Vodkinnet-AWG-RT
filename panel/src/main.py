@@ -6,6 +6,7 @@ Local dev:
 """
 
 import logging
+import os
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -42,7 +43,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.mount("/static", StaticFiles(directory="src/web/static"), name="static")
+STATIC_DIR = "src/web/static"
+# Defensive: git doesn't track empty directories, so a static/ folder
+# with no real assets yet can silently disappear between a commit and
+# a fresh clone+build — this crashed the whole app on first deploy
+# (RuntimeError from StaticFiles at import time) before this guard
+# existed. Create it if missing rather than assume it's always there.
+os.makedirs(STATIC_DIR, exist_ok=True)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 @app.middleware("http")
