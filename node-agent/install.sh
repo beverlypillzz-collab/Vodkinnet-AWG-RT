@@ -94,7 +94,10 @@ log "Building images (this pulls amneziavpn/amneziawg-go:2.0.0 the first time)..
 docker compose build
 
 log "Starting containers..."
-docker compose up -d
+docker compose up -d --remove-orphans
+
+log "Cleaning up dangling images left over from previous builds..."
+docker image prune -f
 
 # --- 5. Wait for the agent to actually respond ----------------------------
 log "Waiting for node-agent to become healthy..."

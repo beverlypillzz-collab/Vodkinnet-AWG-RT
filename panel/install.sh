@@ -173,7 +173,7 @@ log "Building the panel image (as $SERVICE_USER)..."
 as_service_user "cd '$INSTALL_DIR' && docker compose build"
 
 log "Starting postgres and redis..."
-as_service_user "cd '$INSTALL_DIR' && docker compose up -d postgres redis"
+as_service_user "cd '$INSTALL_DIR' && docker compose up -d --remove-orphans postgres redis"
 
 log "Waiting for postgres to become healthy..."
 PG_STATUS="starting"
@@ -192,7 +192,11 @@ fi
 log "postgres is healthy."
 
 log "Starting the panel (this also runs 'alembic upgrade head' on boot)..."
-as_service_user "cd '$INSTALL_DIR' && docker compose up -d panel"
+as_service_user "cd '$INSTALL_DIR' && docker compose up -d --remove-orphans panel"
+
+log "Cleaning up dangling images left over from previous builds..."
+IMAGES_PRUNED="$(as_service_user "docker image prune -f" 2>&1)"
+log "$IMAGES_PRUNED"
 
 log "Waiting for the panel to respond..."
 HEALTHY=0
