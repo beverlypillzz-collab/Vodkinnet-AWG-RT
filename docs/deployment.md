@@ -2,10 +2,10 @@
 
 ## Панель (один раз, на главном сервере)
 
+Скопируйте и выполните целиком — клонирует только папку `panel/` (без исходников агента), ставит всё, убирает служебные git-данные после установки:
+
 ```bash
-git clone <url-репозитория> Vodkinnet-AWG-RT
-cd Vodkinnet-AWG-RT/panel
-sudo ./install.sh
+git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz-collab/Vodkinnet-AWG-RT.git && cd Vodkinnet-AWG-RT && git sparse-checkout set panel && cd panel && sudo ./install.sh && cd .. && rm -rf .git
 ```
 
 Скрипт сам:
@@ -32,9 +32,10 @@ server {
 
 ## Нода (на каждом AWG-сервере, например `nodert-vodkinnet`)
 
+Скопируйте и выполните целиком — клонирует только `node-agent/`, ставит и убирает служебные git-данные:
+
 ```bash
-cd Vodkinnet-AWG-RT/node-agent
-sudo ./install.sh
+git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz-collab/Vodkinnet-AWG-RT.git && cd Vodkinnet-AWG-RT && git sparse-checkout set node-agent && cd node-agent && sudo ./install.sh && cd .. && rm -rf .git
 ```
 
 Скрипт спросит:

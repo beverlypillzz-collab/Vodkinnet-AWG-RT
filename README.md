@@ -12,17 +12,17 @@ docs/            — архитектура, API-контракт, схема Б
 
 ## Быстрый старт
 
-**Панель** (один раз, на главном сервере):
+**Панель** (один раз, на главном сервере) — скопировать и выполнить целиком:
 ```bash
-cd panel && sudo ./install.sh
+git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz-collab/Vodkinnet-AWG-RT.git && cd Vodkinnet-AWG-RT && git sparse-checkout set panel && cd panel && sudo ./install.sh && cd .. && rm -rf .git
 ```
 
-**Каждая нода** (на каждом AWG-сервере):
+**Каждая нода** (на каждом AWG-сервере) — скопировать и выполнить целиком:
 ```bash
-cd node-agent && sudo ./install.sh
+git clone --filter=blob:none --sparse --depth 1 https://github.com/beverlypillzz-collab/Vodkinnet-AWG-RT.git && cd Vodkinnet-AWG-RT && git sparse-checkout set node-agent && cd node-agent && sudo ./install.sh && cd .. && rm -rf .git
 ```
 
-Полная инструкция — `docs/deployment.md`.
+Каждая команда клонирует только нужную папку (не весь репозиторий), ставит Docker при необходимости, генерирует секреты и поднимает контейнеры — без ручных промежуточных шагов. Полная инструкция — `docs/deployment.md`.
 
 ## Почему AmneziaWG 2.0
 
