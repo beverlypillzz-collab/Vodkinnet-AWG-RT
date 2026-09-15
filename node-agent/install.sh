@@ -3,7 +3,7 @@
 # Installs one AWG-RT node: the amnezia-awg2 (AmneziaWG 2.0) container
 # plus the node-agent that the panel talks to.
 #
-# Run this ON THE NODE itself (e.g. nodert-vodkinnet), from inside the
+# Run this ON THE NODE itself (e.g. my-awg-node), from inside the
 # node-agent/ directory of this repo:
 #
 #   cd Vodkinnet-AWG-RT/node-agent
@@ -61,7 +61,7 @@ if [ -f .env ]; then
 else
     log "No .env found — let's set one up."
 
-    read -rp "Node name (for your own reference, e.g. nodert-vodkinnet): " NODE_NAME_INPUT
+    read -rp "Node name (for your own reference, e.g. my-awg-node): " NODE_NAME_INPUT
     read -rp "UDP port for AmneziaWG to listen on [55632]: " AWG_LISTEN_PORT_INPUT
     AWG_LISTEN_PORT_INPUT="${AWG_LISTEN_PORT_INPUT:-55632}"
     read -rp "Publicly reachable hostname/IP for this node (leave blank if the panel will supply it): " AWG_PUBLIC_ENDPOINT_INPUT

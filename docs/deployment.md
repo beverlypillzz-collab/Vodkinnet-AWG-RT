@@ -48,7 +48,7 @@ server {
 }
 ```
 
-## Нода (на каждом AWG-сервере, например `nodert-vodkinnet`)
+## Нода (на каждом AWG-сервере, например `my-awg-node`)
 
 Скопируйте и выполните целиком — клонирует только `node-agent/`, ставит и убирает служебные git-данные:
 
@@ -90,7 +90,7 @@ ufw allow 55632/udp
 
 ```json
 {
-  "name": "nodert-vodkinnet",
+  "name": "my-awg-node",
   "hostname": "<публичный IP или домен ноды>",
   "agent_port": 8181,
   "agent_token": "<из вывода install.sh>",

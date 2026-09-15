@@ -18,7 +18,7 @@
         │ (agent_token per node)
         ▼
 ┌─────────────────────────────────────────────┐
-│  Нода (node-agent/) — например nodert-vodkinnet│
+│  Нода (node-agent/) — например my-awg-node│
 │                                                 │
 │  ┌────────────┐         ┌──────────────────┐  │
 │  │ node-agent │──exec──▶│  amnezia-awg2     │  │
